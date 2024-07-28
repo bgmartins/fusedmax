@@ -2,7 +2,6 @@ from torch import nn
 from torch import autograd as ta
 
 class _BaseBatchProjection(ta.Function):
-    """Applies a sample-wise normalizing projection over a batch."""
 
     @staticmethod
     def forward(ctx, x, lengths=None):
