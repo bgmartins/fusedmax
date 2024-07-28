@@ -2,14 +2,6 @@ from torch import nn
 from torch import autograd as ta
 
 class _BaseBatchProjection(ta.Function):
-
-    @staticmethod
-    def project():
-        pass
-
-    @staticmethod
-    def project_jv():
-        pass
         
     @staticmethod
     def forward(ctx, x, lengths=None):
@@ -26,7 +18,7 @@ class _BaseBatchProjection(ta.Function):
         y_star.resize_as_(x)
         y_star.zero_()
         for i in range(n_samples):
-            y_star[i, :lengths[i]] = _BaseBatchProjection.project(x[i, :lengths[i]])
+            y_star[i, :lengths[i]] = __class__.project(x[i, :lengths[i]])
         if requires_squeeze:
             y_star = y_star.squeeze()
         ctx.mark_non_differentiable(y_star)
@@ -61,7 +53,7 @@ class _BaseBatchProjection(ta.Function):
         if lengths is None:
             lengths = [max_dim] * n_samples
         for i in range(n_samples):
-            din[i, :lengths[i]] = _BaseBatchProjection.project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
+            din[i, :lengths[i]] = __class__.project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
         if requires_squeeze:
             din = din.squeeze()
         return din, None
