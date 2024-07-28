@@ -7,7 +7,6 @@ In: Proc. of ICML 2016, https://arxiv.org/abs/1602.02068
 """
 
 from __future__ import division
-
 import numpy as np
 import torch
 from torch import nn
@@ -44,6 +43,6 @@ class SparsemaxFunction(_BaseBatchProjection):
 class Sparsemax(nn.Module):
 
     @staticmethod
-    def forward(self, x, lengths=None):
+    def forward(x, lengths=None):
         sparsemax = SparsemaxFunction()
         return sparsemax(x, lengths)
