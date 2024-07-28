@@ -13,7 +13,7 @@ from torch import nn
 from torch import autograd as ta
 from .isotonic import isotonic_regression
 from .base import _BaseBatchProjection
-from .sparsemax import SparsemaxFunctionNew
+from .sparsemax import SparsemaxFunction
 
 def oscar_prox_jv(y_hat, dout):
     y_hat = y_hat.detach().numpy()
