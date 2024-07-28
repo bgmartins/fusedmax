@@ -3,8 +3,8 @@ import torch
 from torch import nn
 from torch import autograd as ta
 from .isotonic import isotonic_regression
-from .base import _BaseBatchProjection
 from .sparsemax import SparsemaxFunction
+from torch import autograd as ta
 
 def oscar_project_jv(y_hat, dout):
     y_hat = y_hat.detach().numpy()
