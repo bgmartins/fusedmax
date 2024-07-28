@@ -94,10 +94,11 @@ class OscarProxFunction(ta.Function):
 
 class Oscarmax(nn.Module):
     def __init__(self, beta=1):
+        self.alpha = 0
         self.beta = beta
         super(Oscarmax, self).__init__()
 
     def forward(self, x, lengths=None):
         oscar_prox = OscarProxFunction()
         sparsemax = SparsemaxFunction()
-        return sparsemax.apply(oscar_prox.apply(x, beta=self.beta, lengths=lengths), lengths)
+        return sparsemax.apply(oscar_prox.apply(x, self.alpha, self.beta, lengths), lengths)
