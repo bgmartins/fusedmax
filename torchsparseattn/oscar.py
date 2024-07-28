@@ -21,7 +21,7 @@ def oscar_prox_jv(y_hat, dout):
     din_np *= sign
     return din
 
-def project_jv(dout, y_hat):
+def oscar_project_jv(dout, y_hat):
     return oscar_prox_jv(y_hat, dout)
 
 def prox_owl(v, w):
