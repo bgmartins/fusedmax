@@ -93,7 +93,7 @@ class FusedProxFunction(ta.Function):
         if lengths is None: lengths = [max_dim] * n_samples
         for i in range(n_samples): din[i, :lengths[i]] = fused_project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
         if requires_squeeze: din = din.squeeze()
-        return din, None
+        return din, None, None
 
 class Fusedmax(nn.Module):
     
