@@ -37,6 +37,17 @@ def fused_prox_jv_fast(y_hat, dout):
     _inplace_fused_prox_jv(y_hat.detach().numpy(), dout.numpy())
     return dout
 
+def fused_project(x, alpha=1):
+    x_np = x.detach().numpy().copy()
+    prox_tv1d(x_np, alpha)
+    y_hat = torch.from_numpy(x_np)
+    return y_hat
+
+def fused_project_jv(dout, y_hat):
+    dout = dout.clone()
+    _inplace_fused_prox_jv(y_hat.detach().numpy(), dout.numpy())
+    return dout
+
 class FusedProxFunction(_BaseBatchProjection):
 
     @staticmethod
@@ -54,8 +65,12 @@ class FusedProxFunction(_BaseBatchProjection):
 
 class Fusedmax(nn.Module):
 
-    @staticmethod
-    def forward(x, alpha=1, lengths=None):
-        fused_prox = FusedProxFunction(alpha)
+class Fusedmax(nn.Module):
+    def __init__(self, alpha=1):
+        self.alpha = alpha
+        super(Fusedmax, self).__init__()
+
+    def forward(self, x, lengths=None):
+        fused_prox = FusedProxFunction(self.alpha)
         sparsemax = SparsemaxFunction()
         return sparsemax.apply(fused_prox.apply(x, lengths), lengths)
