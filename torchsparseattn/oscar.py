@@ -5,8 +5,8 @@ from torch import autograd as ta
 from .isotonic import isotonic_regression
 from .sparsemax import SparsemaxFunction
 
-def oscar_project_jv(y, dout):
-    y_hat = y.detach().numpy()
+def oscar_project_jv(y_hat, dout):
+    y_hat = y_hat.detach().numpy()
     din = dout.clone().zero_()
     dout = dout.numpy()
     din_np = din.numpy()
@@ -88,7 +88,7 @@ class OscarProxFunction(ta.Function):
         din.resize_as_(y_star)
         din.zero_()
         if lengths is None: lengths = [max_dim] * n_samples
-        for i in range(n_samples): din[i, :lengths[i]] = oscar_project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
+        for i in range(n_samples): din[i, :lengths[i]] = oscar_project_jv(y_star[i, :lengths[i]], dout[i, :lengths[i]])
         if requires_squeeze: din = din.squeeze()
         return din, None, None, None
 
