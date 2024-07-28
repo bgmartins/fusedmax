@@ -8,7 +8,6 @@ import numpy as np
 
 from ._isotonic import _inplace_contiguous_isotonic_regression
 
-
 def isotonic_regression(y, sample_weight=None, y_min=None, y_max=None,
                         increasing=True):
     """Solve the isotonic regression model::
