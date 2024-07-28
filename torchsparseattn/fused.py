@@ -13,7 +13,7 @@ from torch import nn
 from torch import autograd as ta
 import warnings
 from .base import _BaseBatchProjection
-from .sparsemax import SparsemaxFunction
+from .sparsemax import SparsemaxFunctionNew
 from ._fused import prox_tv1d
 
 def _inplace_fused_prox_jv_slow(y_hat, dout):
@@ -70,19 +70,3 @@ class Fusedmax(nn.Module):
         fused_prox = FusedProxFunction(alpha)
         sparsemax = SparsemaxFunction()
         return sparsemax(fused_prox(x, lengths), lengths)
-
-if __name__ == '__main__':
-    from timeit import timeit
-    torch.manual_seed(1)
-    for dim in (5, 10, 50, 100, 500, 1000):
-        x = torch.randn(dim)
-        x_var = ta.Variable(x, requires_grad=True)
-        y_hat = FusedProxFunction()(x_var).data
-        dout = torch.arange(0, dim)
-        print("dimension={}".format(dim))
-        print("slow", timeit("fused_prox_jv_slow(y_hat, dout)",
-                             globals=globals(),
-                             number=10000))
-        print("fast", timeit("fused_prox_jv_fast(y_hat, dout)",
-                             globals=globals(),
-                             number=10000))
