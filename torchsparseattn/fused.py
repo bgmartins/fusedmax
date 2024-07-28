@@ -50,7 +50,7 @@ def fused_project_jv(dout, y_hat):
 class FusedProxFunction(ta.Function):
         
     @staticmethod
-    def forward(ctx, x, alpha=1.0, lengths=None):
+    def forward(ctx, x, lengths=None, alpha=1.0):
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
@@ -104,4 +104,4 @@ class Fusedmax(nn.Module):
     def forward(self, x, lengths=None):
         fused_prox = FusedProxFunction()
         sparsemax = SparsemaxFunction()
-        return sparsemax.apply(fused_prox.apply(x, self.alpha, lengths), lengths)
+        return sparsemax.apply(fused_prox.apply(x, lengths, self.alpha), lengths)
