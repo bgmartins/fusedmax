@@ -97,6 +97,7 @@ class FusedProxFunction(ta.Function):
         return din, None
 
 class Fusedmax(nn.Module):
+    
     def __init__(self, alpha=1):
         self.alpha = alpha
         super(Fusedmax, self).__init__()
