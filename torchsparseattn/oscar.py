@@ -93,7 +93,7 @@ class OscarProxFunction(ta.Function):
         if lengths is None: lengths = [max_dim] * n_samples
         for i in range(n_samples): din[i, :lengths[i]] = oscar_project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
         if requires_squeeze: din = din.squeeze()
-        return din, None, None
+        return din, None, None, None
 
 class Oscarmax(nn.Module):
     def __init__(self, beta=1.0):
