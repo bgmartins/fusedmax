@@ -13,7 +13,7 @@ from torch import nn
 from torch import autograd as ta
 import warnings
 from .base import _BaseBatchProjection
-from .sparsemax import SparsemaxFunctionNew
+from .sparsemax import SparsemaxFunction
 from ._fused import prox_tv1d
 
 def _inplace_fused_prox_jv_slow(y_hat, dout):
