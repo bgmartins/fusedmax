@@ -98,7 +98,7 @@ class OscarProxFunction(ta.Function):
         return din, None, None, None
 
 class Oscarmax(nn.Module):
-    def __init__(self, beta=1.0):
+    def __init__(self, beta=0.01):
         self.alpha = 0
         self.beta = beta
         super(Oscarmax, self).__init__()
