@@ -3,7 +3,6 @@ import torch
 from torch import nn
 from torch import autograd as ta
 import warnings
-from .base import _BaseBatchProjection
 from .sparsemax import SparsemaxFunction
 from ._fused import prox_tv1d
 
