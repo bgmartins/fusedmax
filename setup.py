@@ -16,9 +16,8 @@ extensions = [
 
 extensions = cythonize(extensions)
 
-
 setup(name="torchsparseattn",
-      version="0.3.dev0",
+      version="0.4.dev0",
       description="Sparse structured attention mechanisms for pytorch",
       author="Vlad Niculae",
       author_email="vlad@vene.ro",
