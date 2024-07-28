@@ -47,7 +47,7 @@ def oscar_project(self, x, alpha=0, beta=1):
 class OscarProxFunction(ta.Function):
         
     @staticmethod
-    def forward(ctx, x, lengths=None):
+    def forward(ctx, x, alpha=0, beta=1, lengths=None):
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
@@ -60,7 +60,7 @@ class OscarProxFunction(ta.Function):
         y_star = x.new()
         y_star.resize_as_(x)
         y_star.zero_()
-        for i in range(n_samples): y_star[i, :lengths[i]] = oscar_project(x[i, :lengths[i]])
+        for i in range(n_samples): y_star[i, :lengths[i]] = oscar_project(x[i, :lengths[i]], alpha, beta)
         if requires_squeeze: y_star = y_star.squeeze()
         ctx.mark_non_differentiable(y_star)
         if has_lengths:
@@ -98,6 +98,6 @@ class Oscarmax(nn.Module):
         super(Oscarmax, self).__init__()
 
     def forward(self, x, lengths=None):
-        oscar_prox = OscarProxFunction(beta=self.beta)
+        oscar_prox = OscarProxFunction()
         sparsemax = SparsemaxFunction()
-        return sparsemax.apply(oscar_prox.apply(x, lengths), lengths)
+        return sparsemax.apply(oscar_prox.apply(x, beta=self.beta, lengths=lengths), lengths)
