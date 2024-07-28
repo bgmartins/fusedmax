@@ -69,7 +69,7 @@ class FusedProxFunction(_BaseBatchProjection):
 class Fusedmax(nn.Module):
 
     @staticmethod
-    def forward(self, x, alpha=1, lengths=None):
+    def forward(x, alpha=1, lengths=None):
         fused_prox = FusedProxFunction(alpha)
         sparsemax = SparsemaxFunction()
         return sparsemax(fused_prox(x, lengths), lengths)
