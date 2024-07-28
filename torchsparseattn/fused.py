@@ -19,15 +19,11 @@ from .sparsemax import SparsemaxFunction
 from ._fused import prox_tv1d
 
 def _inplace_fused_prox_jv_slow(y_hat, dout):
-    """not efficient in python for long seqs, but template for a cython impl"""
-
     n_features = len(dout)
-
     for i in range(n_features + 1):
         if i in (0, n_features) or y_hat[i] != y_hat[i - 1]:
             if i > 0:
                 dout[last_ix:i] = acc / n
-
             if i < n_features:
                 last_ix = i
                 acc = dout[i]
@@ -37,7 +33,6 @@ def _inplace_fused_prox_jv_slow(y_hat, dout):
             n += 1
     return dout
 
-
 try:
     from ._fused_jv import _inplace_fused_prox_jv
 except ImportError:
@@ -45,18 +40,15 @@ except ImportError:
                   "pass. Slow implementation used instead.")
     _inplace_fused_prox_jv = _inplace_fused_prox_jv_slow
 
-
 def fused_prox_jv_slow(y_hat, dout):
     dout = dout.clone()
     _inplace_fused_prox_jv_slow(y_hat, dout)
     return dout
 
-
 def fused_prox_jv_fast(y_hat, dout):
     dout = dout.clone()
     _inplace_fused_prox_jv(y_hat.detach().numpy(), dout.numpy())
     return dout
-
 
 class FusedProxFunction(_BaseBatchProjection):
 
@@ -74,17 +66,6 @@ class FusedProxFunction(_BaseBatchProjection):
         _inplace_fused_prox_jv(y_hat.detach().numpy(), dout.numpy())
         return dout
 
-
-class FusedmaxOld(nn.Module):
-    def __init__(self, alpha=1):
-        self.alpha = alpha
-        super(FusedmaxOld, self).__init__()
-
-    def forward(self, x, lengths=None):
-        fused_prox = FusedProxFunction(self.alpha)
-        sparsemax = SparsemaxFunction()
-        return sparsemax(fused_prox(x, lengths), lengths)
-
 class Fusedmax(nn.Module):
 
     @staticmethod
@@ -93,13 +74,10 @@ class Fusedmax(nn.Module):
         sparsemax = SparsemaxFunction()
         return sparsemax(fused_prox(x, lengths), lengths)
 
-
 if __name__ == '__main__':
     from timeit import timeit
     torch.manual_seed(1)
-
     for dim in (5, 10, 50, 100, 500, 1000):
-
         x = torch.randn(dim)
         x_var = ta.Variable(x, requires_grad=True)
         y_hat = FusedProxFunction()(x_var).data
