@@ -36,7 +36,7 @@ def fused_prox_jv_fast(y_hat, dout):
     _inplace_fused_prox_jv(y_hat.detach().numpy(), dout.numpy())
     return dout
 
-def fused_project(x, alpha=1):
+def fused_project(x, alpha=1.0):
     x_np = x.detach().numpy().copy()
     prox_tv1d(x_np, alpha)
     y_hat = torch.from_numpy(x_np)
@@ -50,7 +50,7 @@ def fused_project_jv(dout, y_hat):
 class FusedProxFunction(ta.Function):
         
     @staticmethod
-    def forward(ctx, x, alpha=1, lengths=None):
+    def forward(ctx, x, alpha=1.0, lengths=None):
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
@@ -97,7 +97,7 @@ class FusedProxFunction(ta.Function):
 
 class Fusedmax(nn.Module):
     
-    def __init__(self, alpha=1):
+    def __init__(self, alpha=1.0):
         self.alpha = alpha
         super(Fusedmax, self).__init__()
 
