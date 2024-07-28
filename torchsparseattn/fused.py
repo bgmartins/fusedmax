@@ -99,7 +99,7 @@ class FusedProxFunction(ta.Function):
 
 class Fusedmax(nn.Module):
     
-    def __init__(self, alpha=1.0):
+    def __init__(self, alpha=0.1):
         self.alpha = alpha
         super(Fusedmax, self).__init__()
 
