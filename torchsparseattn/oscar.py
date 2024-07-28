@@ -16,7 +16,6 @@ from .isotonic import isotonic_regression
 from .base import _BaseBatchProjection
 from .sparsemax import SparsemaxFunction
 
-
 def oscar_prox_jv(y_hat, dout):
     y_hat = y_hat.detach().numpy()
     din = dout.clone().zero_()
@@ -36,7 +35,6 @@ def oscar_prox_jv(y_hat, dout):
     din_np *= sign
     return din
 
-
 def prox_owl(v, w):
     """Proximal operator of the OWL norm dot(w, reversed(sort(v)))
 
@@ -46,28 +44,23 @@ def prox_owl(v, w):
     and projections.
     eprint http://arxiv.org/abs/1409.4271
     """
-
     # wlog operate on absolute values
     v_abs = np.abs(v)
     ix = np.argsort(v_abs)[::-1]
     v_abs = v_abs[ix]
     # project to K+ (monotone non-negative decreasing cone)
     v_abs = isotonic_regression(v_abs - w, y_min=0, increasing=False)
-
     # undo the sorting
     inv_ix = np.zeros_like(ix)
     inv_ix[ix] = np.arange(len(v))
     v_abs = v_abs[inv_ix]
-
     return np.sign(v) * v_abs
-
 
 def _oscar_weights(alpha, beta, size):
     w = np.arange(size - 1, -1, -1, dtype=np.float32)
     w *= beta
     w += alpha
     return w
-
 
 class OscarProxFunction(_BaseBatchProjection):
     """Proximal operator of the OSCAR regularizer.
@@ -104,12 +97,10 @@ class OscarProxFunction(_BaseBatchProjection):
 
 
 class Oscarmax(nn.Module):
-    def __init__(self, beta=1):
-        self.beta = beta
-        super(Oscarmax, self).__init__()
-
-    def forward(self, x, lengths=None):
-        oscar_prox = OscarProxFunction(beta=self.beta)
+    
+    @staticmethod    
+    def forward(self, x, beta=1, lengths=None):
+        oscar_prox = OscarProxFunction(beta=beta)
         sparsemax = SparsemaxFunction()
         return sparsemax(oscar_prox(x, lengths), lengths)
 
