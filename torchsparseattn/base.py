@@ -6,6 +6,7 @@ class _BaseBatchProjection(ta.Function):
 
     @staticmethod
     def forward(ctx, x, lengths=None):
+        print("*********=======********")
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
