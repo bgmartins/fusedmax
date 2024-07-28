@@ -7,6 +7,16 @@ from torch import nn
 from torch import autograd as ta
 
 class SparsemaxFunctionNew(ta.Function):
+    
+    @staticmethod
+    def forward(ctx, x, lengths=None):
+        return x
+        
+    @staticmethod
+    def backward(ctx, dout):
+        return dout
+    
+class SparsemaxFunction(ta.Function):
 
     @staticmethod
     def forward(ctx, x, lengths=None):
