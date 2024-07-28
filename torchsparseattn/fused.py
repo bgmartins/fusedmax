@@ -8,12 +8,10 @@ https://arxiv.org/abs/1705.07704
 """
 
 from __future__ import division
-
 import torch
 from torch import nn
 from torch import autograd as ta
 import warnings
-
 from .base import _BaseBatchProjection
 from .sparsemax import SparsemaxFunction
 from ._fused import prox_tv1d
@@ -52,16 +50,15 @@ def fused_prox_jv_fast(y_hat, dout):
 
 class FusedProxFunction(_BaseBatchProjection):
 
-    def __init__(self, alpha=1):
-        self.alpha = alpha
-
-    def project(self, x):
+    @staticmethod
+    def project(self, x, alpha=1):
         x_np = x.detach().numpy().copy()
-        prox_tv1d(x_np, self.alpha)
+        prox_tv1d(x_np, alpha)
         y_hat = torch.from_numpy(x_np)
         return y_hat
 
-    def project_jv(self, dout, y_hat):
+    @staticmethod
+    def project_jv(dout, y_hat):
         dout = dout.clone()
         _inplace_fused_prox_jv(y_hat.detach().numpy(), dout.numpy())
         return dout
