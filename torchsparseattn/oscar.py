@@ -40,7 +40,7 @@ def _oscar_weights(alpha, beta, size):
     w += alpha
     return w
 
-def oscar_project(x, alpha=0, beta=1):
+def oscar_project(x, alpha=0.0, beta=1.0):
     x_np = x.detach().numpy().copy()
     weights = _oscar_weights(alpha, beta, x_np.shape[0])
     y_hat_np = prox_owl(x_np, weights)
@@ -50,7 +50,7 @@ def oscar_project(x, alpha=0, beta=1):
 class OscarProxFunction(ta.Function):
         
     @staticmethod
-    def forward(ctx, x, alpha=0, beta=1, lengths=None):
+    def forward(ctx, x, alpha=0.0, beta=1.0, lengths=None):
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
@@ -96,7 +96,7 @@ class OscarProxFunction(ta.Function):
         return din, None, None
 
 class Oscarmax(nn.Module):
-    def __init__(self, beta=1):
+    def __init__(self, beta=1.0):
         self.alpha = 0
         self.beta = beta
         super(Oscarmax, self).__init__()
