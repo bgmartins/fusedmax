@@ -5,7 +5,7 @@ from torch import autograd as ta
 from .isotonic import isotonic_regression
 from .sparsemax import SparsemaxFunction
 
-def oscar_project_jv(y_hat, dout):
+def oscar_prox_jv(y_hat, dout):
     y_hat = y_hat.detach().numpy()
     din = dout.clone().zero_()
     dout = dout.numpy()
@@ -20,6 +20,9 @@ def oscar_project_jv(y_hat, dout):
     tmp.take(inv, mode='clip', out=din_np)
     din_np *= sign
     return din
+
+def project_jv(dout, y_hat):
+    return oscar_prox_jv(y_hat, dout)
 
 def prox_owl(v, w):
     v_abs = np.abs(v)
@@ -88,9 +91,9 @@ class OscarProxFunction(ta.Function):
         din.resize_as_(y_star)
         din.zero_()
         if lengths is None: lengths = [max_dim] * n_samples
-        for i in range(n_samples): din[i, :lengths[i]] = oscar_project_jv(y_star[i, :lengths[i]], dout[i, :lengths[i]])
+        for i in range(n_samples): din[i, :lengths[i]] = oscar_project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
         if requires_squeeze: din = din.squeeze()
-        return din, None, None, None
+        return din, None, None
 
 class Oscarmax(nn.Module):
     def __init__(self, beta=1):
