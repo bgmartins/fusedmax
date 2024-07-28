@@ -81,4 +81,4 @@ class Sparsemax(nn.Module):
     @staticmethod
     def forward(x, lengths=None):
         sparsemax = SparsemaxFunction()
-        return sparsemax(x, lengths)
+        return sparsemax.apply(x, lengths)
