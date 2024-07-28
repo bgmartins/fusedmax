@@ -11,22 +11,18 @@ import numpy as np
 import torch
 from torch import nn
 from torch import autograd as ta
-
 from .isotonic import isotonic_regression
 from .base import _BaseBatchProjection
-from .sparsemax import SparsemaxFunction
+from .sparsemax import SparsemaxFunctionNew
 
 def oscar_prox_jv(y_hat, dout):
     y_hat = y_hat.detach().numpy()
     din = dout.clone().zero_()
     dout = dout.numpy()
     din_np = din.numpy()
-
     sign = np.sign(y_hat)
     y_hat = np.abs(y_hat)
-
-    uniq, inv, counts = np.unique(y_hat, return_inverse=True,
-                                  return_counts=True)
+    uniq, inv, counts = np.unique(y_hat, return_inverse=True, return_counts=True)
     n_unique = len(uniq)
     tmp = np.zeros((n_unique,), dtype=y_hat.dtype)
     np.add.at(tmp, inv, dout * sign)
@@ -36,21 +32,10 @@ def oscar_prox_jv(y_hat, dout):
     return din
 
 def prox_owl(v, w):
-    """Proximal operator of the OWL norm dot(w, reversed(sort(v)))
-
-    Follows description and notation from:
-    X. Zeng, M. Figueiredo,
-    The ordered weighted L1 norm: Atomic formulation, dual norm,
-    and projections.
-    eprint http://arxiv.org/abs/1409.4271
-    """
-    # wlog operate on absolute values
     v_abs = np.abs(v)
     ix = np.argsort(v_abs)[::-1]
     v_abs = v_abs[ix]
-    # project to K+ (monotone non-negative decreasing cone)
     v_abs = isotonic_regression(v_abs - w, y_min=0, increasing=False)
-    # undo the sorting
     inv_ix = np.zeros_like(ix)
     inv_ix[ix] = np.arange(len(v))
     v_abs = v_abs[inv_ix]
