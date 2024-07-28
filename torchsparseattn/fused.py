@@ -77,7 +77,9 @@ class FusedProxFunction(ta.Function):
         if not ctx.needs_input_grad[0]: return None
         if len(ctx.needs_input_grad) > 1 and ctx.needs_input_grad[1]: raise ValueError("Cannot differentiate {} w.r.t. the sequence lengths".format(ctx.__name__))
         saved = ctx.saved_tensors
-        if len(saved) == 2: y_star, lengths = saved
+        if len(saved) >= 2: 
+            y_star = saved[0]
+            lengths = saved[1]
         else:
             y_star, = saved
             lengths = None
