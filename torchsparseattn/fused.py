@@ -51,7 +51,7 @@ def fused_prox_jv_fast(y_hat, dout):
 class FusedProxFunction(_BaseBatchProjection):
 
     @staticmethod
-    def project(self, x, alpha=1):
+    def project(x, alpha=1):
         x_np = x.detach().numpy().copy()
         prox_tv1d(x_np, alpha)
         y_hat = torch.from_numpy(x_np)
