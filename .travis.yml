@@ -29,7 +29,6 @@ install:
   - conda install -c pytorch pytorch-cpu=$TORCH_VERSION numpy scipy pytest cython
 
   # install package
-  - cd pytorch
   - pip install .
 
 script:
