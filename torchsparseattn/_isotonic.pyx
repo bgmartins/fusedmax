@@ -9,7 +9,6 @@ cimport numpy as np
 cimport cython
 from cython cimport floating
 
-
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
