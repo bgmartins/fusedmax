@@ -104,4 +104,4 @@ class Fusedmax(nn.Module):
     def forward(self, x, lengths=None):
         fused_prox = FusedProxFunction()
         sparsemax = SparsemaxFunction()
-        return sparsemax.apply(fused_prox.apply(x, alpha=self.alpha, lengths=lengths), lengths)
+        return sparsemax.apply(fused_prox.apply(x, self.alpha, lengths), lengths)
