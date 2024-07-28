@@ -6,8 +6,7 @@ from .isotonic import isotonic_regression
 from .sparsemax import SparsemaxFunction
 
 def oscar_project_jv(y, dout):
-    try: y_hat = y.detach().numpy()
-    except: y_hat = y
+    y_hat = y.detach().numpy()
     din = dout.clone().zero_()
     dout = dout.numpy()
     din_np = din.numpy()
@@ -38,9 +37,8 @@ def _oscar_weights(alpha, beta, size):
     w += alpha
     return w
 
-def oscar_project(self, x, alpha=0, beta=1):
-    try: x_np = x_np.detach().numpy().copy()
-    except: x_np = x    
+def oscar_project(x, alpha=0, beta=1):
+    x_np = x_np.detach().numpy().copy()
     weights = _oscar_weights(alpha, beta, x_np.shape[0])
     y_hat_np = prox_owl(x_np, weights)
     y_hat = torch.from_numpy(y_hat_np)
