@@ -1,12 +1,3 @@
-"""Oscarmax attention
-
-Clusters attention weights into groups with equal weight, regardless of index.
-
-A Regularized Framework for Sparse and Structured Neural Attention
-Vlad Niculae, Mathieu Blondel
-https://arxiv.org/abs/1705.07704
-"""
-
 import numpy as np
 import torch
 from torch import nn
@@ -53,7 +44,6 @@ def oscar_project(self, x, alpha=0, beta=1):
         y_hat_np = prox_owl(x_np, weights)
         y_hat = torch.from_numpy(y_hat_np)
         return y_hat
-
 
 class OscarProxFunction(ta.Function):
         
@@ -104,9 +94,11 @@ class OscarProxFunction(ta.Function):
         return din, None
 
 class Oscarmax(nn.Module):
-    
-    def forward(self, x, beta=1, lengths=None):
-        oscar_prox = OscarProxFunction(beta=beta)
+    def __init__(self, beta=1):
+        self.beta = beta
+        super(Oscarmax, self).__init__()
+
+    def forward(self, x, lengths=None):
+        oscar_prox = OscarProxFunction(beta=self.beta)
         sparsemax = SparsemaxFunction()
         return sparsemax.apply(oscar_prox.apply(x, lengths), lengths)
-
