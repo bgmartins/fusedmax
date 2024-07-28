@@ -48,23 +48,6 @@ def _oscar_weights(alpha, beta, size):
     return w
 
 class OscarProxFunction(_BaseBatchProjection):
-    """Proximal operator of the OSCAR regularizer.
-
-    ||w||_oscar = alpha ||w||_1 + beta * sum_i<j max { |w_i|, |w_j| }
-
-    Implemented via the OWL norm with appropriate choice of weights, as
-    described in:
-
-    X. Zeng, M. Figueiredo,
-    The ordered weighted L1 norm: Atomic formulation, dual norm,
-    and projections.
-    eprint http://arxiv.org/abs/1409.4271
-
-    Backward pass is described in:
-    V. Niculae, M. Blondel,
-    A Regularized Framework for Sparse and Structured Neural Attention.
-    eprint https://arxiv.org/abs/1705.07704
-    """
 
     def __init__(self, alpha=0, beta=1):
         self.alpha = alpha
@@ -80,31 +63,11 @@ class OscarProxFunction(_BaseBatchProjection):
     def project_jv(self, dout, y_hat):
         return oscar_prox_jv(y_hat, dout)
 
-
 class Oscarmax(nn.Module):
     
     @staticmethod    
     def forward(self, x, beta=1, lengths=None):
         oscar_prox = OscarProxFunction(beta=beta)
         sparsemax = SparsemaxFunction()
-        return sparsemax(oscar_prox(x, lengths), lengths)
+        return sparsemax.apply(oscar_prox.apply(x, lengths), lengths)
 
-
-if __name__ == '__main__':
-    from timeit import timeit
-    torch.manual_seed(1)
-
-    for dim in (5, 10, 50, 100, 500, 1000):
-
-        x = torch.randn(dim)
-        x_var = ta.Variable(x, requires_grad=True)
-
-        def _run_backward(x):
-            y_hat = OscarProxFunction(beta=0.1)(x)
-            val = y_hat.mean()
-            val.backward()
-
-        print("dimension={}".format(dim))
-        print("la", timeit("_run_backward(x_var)",
-                           globals=globals(),
-                           number=10000))
