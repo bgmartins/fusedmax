@@ -6,11 +6,6 @@ import torch
 from torch import nn
 from torch import autograd as ta
 
-class SparsemaxFunctionNew(ta.Function):
-    
-    @staticmethod
-    def forward(ctx, x, lengths=None): return x
-    
 class SparsemaxFunction(ta.Function):
 
     @staticmethod
