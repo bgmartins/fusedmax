@@ -1,7 +1,6 @@
 cimport cython
 from cython cimport floating
 
-
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.cdivision(True)
@@ -24,6 +23,3 @@ def _inplace_fused_prox_jv(floating[::1] y_hat, floating[::1] dout):
             acc += dout[i]
             n += 1
     return dout
-
-
-
