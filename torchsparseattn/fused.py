@@ -76,13 +76,21 @@ class FusedProxFunction(_BaseBatchProjection):
         return dout
 
 
-class Fusedmax(nn.Module):
+class FusedmaxOld(nn.Module):
     def __init__(self, alpha=1):
         self.alpha = alpha
-        super(Fusedmax, self).__init__()
+        super(FusedmaxOld, self).__init__()
 
     def forward(self, x, lengths=None):
         fused_prox = FusedProxFunction(self.alpha)
+        sparsemax = SparsemaxFunction()
+        return sparsemax(fused_prox(x, lengths), lengths)
+
+class Fusedmax(nn.Module):
+
+    @staticmethod
+    def forward(self, x, alpha=1, lengths=None):
+        fused_prox = FusedProxFunction(alpha)
         sparsemax = SparsemaxFunction()
         return sparsemax(fused_prox(x, lengths), lengths)
 
