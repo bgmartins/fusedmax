@@ -13,7 +13,6 @@ import torch
 from torch import nn
 from .base import _BaseBatchProjection
 
-
 def project_simplex(v, z=1):
     v_sorted, _ = torch.sort(v, dim=0, descending=True)
     cssv = torch.cumsum(v_sorted, dim=0) - z
@@ -24,7 +23,6 @@ def project_simplex(v, z=1):
     w = torch.clamp(v - tau, min=0)
     return w
 
-
 def sparsemax_grad(dout, w_star):
     supp = w_star > 0
     masked = dout.masked_select(supp)
@@ -33,7 +31,6 @@ def sparsemax_grad(dout, w_star):
     out = dout.new(dout.size()).zero_()
     out[supp] = masked
     return(out)
-
 
 class SparsemaxFunction(_BaseBatchProjection):
 
@@ -46,7 +43,7 @@ class SparsemaxFunction(_BaseBatchProjection):
 
 class Sparsemax(nn.Module):
 
+    @staticmethod
     def forward(self, x, lengths=None):
         sparsemax = SparsemaxFunction()
         return sparsemax(x, lengths)
-
