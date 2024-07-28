@@ -50,7 +50,7 @@ def oscar_project(x, alpha=0.0, beta=1.0):
 class OscarProxFunction(ta.Function):
         
     @staticmethod
-    def forward(ctx, x, alpha=0.0, beta=1.0, lengths=None):
+    def forward(ctx, x, lengths=None, alpha=0.0, beta=1.0):
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
@@ -77,7 +77,9 @@ class OscarProxFunction(ta.Function):
         if not ctx.needs_input_grad[0]: return None
         if len(ctx.needs_input_grad) > 1 and ctx.needs_input_grad[1]: raise ValueError("Cannot differentiate {} w.r.t. the sequence lengths".format(ctx.__name__))
         saved = ctx.saved_tensors
-        if len(saved) == 2: y_star, lengths = saved
+        if len(saved) >= 2: 
+            y_star = saved[0]
+            lengths = saved[1]
         else:
             y_star, = saved
             lengths = None
@@ -104,4 +106,4 @@ class Oscarmax(nn.Module):
     def forward(self, x, lengths=None):
         oscar_prox = OscarProxFunction()
         sparsemax = SparsemaxFunction()
-        return sparsemax.apply(oscar_prox.apply(x, self.alpha, self.beta, lengths), lengths)
+        return sparsemax.apply(oscar_prox.apply(x, lengths, self.alpha, self.beta), lengths)
