@@ -1,45 +1,10 @@
-# encoding: utf-8
-# cython: cdivision=True
-# cython: boundscheck=False
-# cython: wraparound=False
-#
-# Authors: Fabian Pedregosa
-# Bundled file from lightning library
-
-"""
-These are some helper functions to compute the proximal operator of some common penalties
-"""
-
 cimport numpy as np
 from cython cimport floating
 
 cpdef prox_tv1d(np.ndarray[ndim=1, dtype=floating] w, floating stepsize):
-    """
-    Computes the proximal operator of the 1-dimensional total variation operator.
-
-    This solves a problem of the form
-
-         argmin_x TV(x) + (1/(2 stepsize)) ||x - w||^2
-
-    where TV(x) is the one-dimensional total variation
-
-    Parameters
-    ----------
-    w: array
-        vector of coefficieents
-    stepsize: float
-        step size (sometimes denoted gamma) in proximal objective function
-
-    References
-    ----------
-    Condat, Laurent. "A direct algorithm for 1D total variation denoising."
-    IEEE Signal Processing Letters (2013)
-    """
     cdef long width, k, k0, kplus, kminus
     cdef floating umin, umax, vmin, vmax, twolambda, minlambda
     width = w.size
-
-    # /to avoid invalid memory access to input[0] and invalid lambda values
     if width > 0 and stepsize >= 0:
         k, k0 = 0, 0			# k: current sample location, k0: beginning of current segment
         umin = stepsize  # u is the dual variable
@@ -56,8 +21,7 @@ cpdef prox_tv1d(np.ndarray[ndim=1, dtype=floating] w, floating stepsize):
                     while True:
                         w[k0] = vmin
                         k0 += 1
-                        if k0 > kminus:
-                            break
+                        if k0 > kminus: break
                     k = k0
                     kminus = k
                     vmin = w[kminus]
@@ -67,8 +31,7 @@ cpdef prox_tv1d(np.ndarray[ndim=1, dtype=floating] w, floating stepsize):
                     while True:
                         w[k0] = vmax
                         k0 += 1
-                        if k0 > kplus:
-                            break
+                        if k0 > kplus: break
                     k = k0
                     kplus = k
                     vmax = w[kplus]
@@ -79,16 +42,14 @@ cpdef prox_tv1d(np.ndarray[ndim=1, dtype=floating] w, floating stepsize):
                     while True:
                         w[k0] = vmin
                         k0 += 1
-                        if k0 > k:
-                            break
+                        if k0 > k: break
                     return
             umin += w[k + 1] - vmin
             if umin < minlambda:       # negative jump necessary
                 while True:
                     w[k0] = vmin
                     k0 += 1
-                    if k0 > kminus:
-                        break
+                    if k0 > kminus: break
                 k = k0
                 kminus = k
                 kplus = kminus
@@ -102,8 +63,7 @@ cpdef prox_tv1d(np.ndarray[ndim=1, dtype=floating] w, floating stepsize):
                     while True:
                         w[k0] = vmax
                         k0 += 1
-                        if k0 > kplus:
-                            break
+                        if k0 > kplus: break
                     k = k0
                     kminus = k
                     kplus = kminus
