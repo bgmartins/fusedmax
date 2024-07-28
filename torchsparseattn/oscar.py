@@ -38,7 +38,7 @@ def _oscar_weights(alpha, beta, size):
     return w
 
 def oscar_project(x, alpha=0, beta=1):
-    x_np = x_np.detach().numpy().copy()
+    x_np = x.detach().numpy().copy()
     weights = _oscar_weights(alpha, beta, x_np.shape[0])
     y_hat_np = prox_owl(x_np, weights)
     y_hat = torch.from_numpy(y_hat_np)
