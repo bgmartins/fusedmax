@@ -5,8 +5,9 @@ from torch import autograd as ta
 from .isotonic import isotonic_regression
 from .sparsemax import SparsemaxFunction
 
-def oscar_project_jv(y_hat, dout):
-    #y_hat = y_hat.detach().numpy()
+def oscar_project_jv(y, dout):
+    try: y_hat = y.detach().numpy()
+    except: y_hat = y
     din = dout.clone().zero_()
     dout = dout.numpy()
     din_np = din.numpy()
@@ -38,9 +39,9 @@ def _oscar_weights(alpha, beta, size):
     return w
 
 def oscar_project(self, x, alpha=0, beta=1):
-    x_np = x
-    #x_np = x_np.detach().numpy().copy()
-    weights = _oscar_weights(self.alpha, self.beta, x_np.shape[0])
+    try: x_np = x_np.detach().numpy().copy()
+    except: x_np = x    
+    weights = _oscar_weights(alpha, beta, x_np.shape[0])
     y_hat_np = prox_owl(x_np, weights)
     y_hat = torch.from_numpy(y_hat_np)
     return y_hat
