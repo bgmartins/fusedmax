@@ -1,17 +1,12 @@
 # encoding: utf8
 
-"""
-From Softmax to Sparsemax: A Sparse Model of Attention and Multi-Label
-Classification. André F. T. Martins, Ramón Fernandez Astudillo
-In: Proc. of ICML 2016, https://arxiv.org/abs/1602.02068
-"""
-
 from __future__ import division
 import numpy as np
 import torch
 from torch import nn
+from torch import autograd as ta
 
-class SparsemaxFunction(_BaseBatchProjection):
+class SparsemaxFunction(ta.Function):
 
     @staticmethod
     def forward(ctx, x, lengths=None):
@@ -28,27 +23,22 @@ class SparsemaxFunction(_BaseBatchProjection):
         y_star = x.new()
         y_star.resize_as_(x)
         y_star.zero_()
-        for i in range(n_samples):
-            y_star[i, :lengths[i]] = project(x[i, :lengths[i]])
-        if requires_squeeze:
-            y_star = y_star.squeeze()
+        for i in range(n_samples): y_star[i, :lengths[i]] = project(x[i, :lengths[i]])
+        if requires_squeeze: y_star = y_star.squeeze()
         ctx.mark_non_differentiable(y_star)
         if has_lengths:
             ctx.mark_non_differentiable(lengths)
             ctx.save_for_backward(y_star, lengths)
-        else:
-            ctx.save_for_backward(y_star)
+        else: ctx.save_for_backward(y_star)
         return y_star
     
     @staticmethod
     def backward(ctx, dout):
-        if not ctx.needs_input_grad[0]:
-            return None
+        if not ctx.needs_input_grad[0]: return None
         if len(ctx.needs_input_grad) > 1 and ctx.needs_input_grad[1]:
             raise ValueError("Cannot differentiate {} w.r.t. the sequence lengths".format(ctx.__name__))
         saved = ctx.saved_tensors
-        if len(saved) == 2:
-            y_star, lengths = saved
+        if len(saved) == 2: y_star, lengths = saved
         else:
             y_star, = saved
             lengths = None
@@ -61,12 +51,9 @@ class SparsemaxFunction(_BaseBatchProjection):
         din = dout.new()
         din.resize_as_(y_star)
         din.zero_()
-        if lengths is None:
-            lengths = [max_dim] * n_samples
-        for i in range(n_samples):
-            din[i, :lengths[i]] = project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
-        if requires_squeeze:
-            din = din.squeeze()
+        if lengths is None: lengths = [max_dim] * n_samples
+        for i in range(n_samples): din[i, :lengths[i]] = project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
+        if requires_squeeze: din = din.squeeze()
         return din, None
         
     @staticmethod
