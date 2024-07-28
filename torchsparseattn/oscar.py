@@ -15,7 +15,7 @@ from .isotonic import isotonic_regression
 from .base import _BaseBatchProjection
 from .sparsemax import SparsemaxFunction
 
-def oscar_prox_jv(y_hat, dout):
+def oscar_project_jv(y_hat, dout):
     y_hat = y_hat.detach().numpy()
     din = dout.clone().zero_()
     dout = dout.numpy()
@@ -47,25 +47,19 @@ def _oscar_weights(alpha, beta, size):
     w += alpha
     return w
 
-class OscarProxFunction(_BaseBatchProjection):
-
-    def __init__(self, alpha=0, beta=1):
-        self.alpha = alpha
-        self.beta = beta
-
-    def project(self, x):
+def oscar_project(self, x, alpha=0, beta=1):
         x_np = x.detach().numpy().copy()
         weights = _oscar_weights(self.alpha, self.beta, x_np.shape[0])
         y_hat_np = prox_owl(x_np, weights)
         y_hat = torch.from_numpy(y_hat_np)
         return y_hat
 
-    def project_jv(self, dout, y_hat):
-        return oscar_prox_jv(y_hat, dout)
+
+class OscarProxFunction(_BaseBatchProjection):
+
 
 class Oscarmax(nn.Module):
     
-    @staticmethod    
     def forward(self, x, beta=1, lengths=None):
         oscar_prox = OscarProxFunction(beta=beta)
         sparsemax = SparsemaxFunction()
