@@ -1,12 +1,3 @@
-"""Fusedmax attention
-
-Clusters neighboring attention weights into groups with equal weight.
-
-A Regularized Framework for Sparse and Structured Neural Attention
-Vlad Niculae, Mathieu Blondel
-https://arxiv.org/abs/1705.07704
-"""
-
 from __future__ import division
 import torch
 from torch import nn
