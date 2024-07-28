@@ -43,5 +43,6 @@ class Sparsemax(nn.Module):
 
     @staticmethod
     def forward(x, lengths=None):
+        print("************============")        
         sparsemax = SparsemaxFunction()
         return sparsemax(x, lengths)
