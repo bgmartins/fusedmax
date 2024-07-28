@@ -75,6 +75,6 @@ class SparsemaxFunction(ta.Function):
 
 class Sparsemax(nn.Module):
 
-    def forward(x, lengths=None):
+    def forward(self, x, lengths=None):
         sparsemax = SparsemaxFunction()
         return sparsemax.apply(x, lengths)
