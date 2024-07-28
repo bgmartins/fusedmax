@@ -5,7 +5,7 @@ class _BaseBatchProjection(ta.Function):
     """Applies a sample-wise normalizing projection over a batch."""
 
     @staticmethod
-    def forward(self, x, lengths=None):
+    def forward(ctx, x, lengths=None):
         requires_squeeze = False
         if x.dim() == 1:
             x = x.unsqueeze(0)
@@ -19,25 +19,25 @@ class _BaseBatchProjection(ta.Function):
         y_star.resize_as_(x)
         y_star.zero_()
         for i in range(n_samples):
-            y_star[i, :lengths[i]] = self.project(x[i, :lengths[i]])
+            y_star[i, :lengths[i]] = ctx.project(x[i, :lengths[i]])
         if requires_squeeze:
             y_star = y_star.squeeze()
-        self.mark_non_differentiable(y_star)
+        ctx.mark_non_differentiable(y_star)
         if has_lengths:
-            self.mark_non_differentiable(lengths)
-            self.save_for_backward(y_star, lengths)
+            ctx.mark_non_differentiable(lengths)
+            ctx.save_for_backward(y_star, lengths)
         else:
-            self.save_for_backward(y_star)
+            ctx.save_for_backward(y_star)
         return y_star
     
     @staticmethod
-    def backward(self, dout):
-        if not self.needs_input_grad[0]:
+    def backward(ctx, dout):
+        if not ctx.needs_input_grad[0]:
             return None
-        if len(self.needs_input_grad) > 1 and self.needs_input_grad[1]:
+        if len(ctx.needs_input_grad) > 1 and ctx.needs_input_grad[1]:
             raise ValueError("Cannot differentiate {} w.r.t. the "
-                             "sequence lengths".format(self.__name__))
-        saved = self.saved_tensors
+                             "sequence lengths".format(ctx.__name__))
+        saved = ctx.saved_tensors
         if len(saved) == 2:
             y_star, lengths = saved
         else:
@@ -55,8 +55,7 @@ class _BaseBatchProjection(ta.Function):
         if lengths is None:
             lengths = [max_dim] * n_samples
         for i in range(n_samples):
-            din[i, :lengths[i]] = self.project_jv(dout[i, :lengths[i]],
-                                                  y_star[i, :lengths[i]])
+            din[i, :lengths[i]] = ctx.project_jv(dout[i, :lengths[i]], y_star[i, :lengths[i]])
         if requires_squeeze:
             din = din.squeeze()
         return din, None
