@@ -39,7 +39,6 @@ class SparsemaxFunction(_BaseBatchProjection):
     def project_jv(self, dout, y_star):
         return sparsemax_grad(dout, y_star)
 
-
 class Sparsemax(nn.Module):
 
     @staticmethod
