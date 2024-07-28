@@ -34,12 +34,10 @@ def sparsemax_grad(dout, w_star):
 class SparsemaxFunction(_BaseBatchProjection):
 
     @staticmethod
-    def project(x):
-        return project_simplex(x)
+    def project(x): return project_simplex(x)
     
     @staticmethod
-    def project_jv(dout, y_star):
-        return sparsemax_grad(dout, y_star)
+    def project_jv(dout, y_star): return sparsemax_grad(dout, y_star)
 
 class Sparsemax(nn.Module):
 
