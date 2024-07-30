@@ -37,10 +37,10 @@ def fused_prox_jv_fast(y_hat, dout):
     return dout
 
 def fused_project(x, alpha=1.0):
-    x_np = x.detach().numpy().copy()
+    x_np = x.cpu().detach().numpy().copy()
     prox_tv1d(x_np, alpha)
     y_hat = torch.from_numpy(x_np)
-    return y_hat
+    return y_hat.to(x.device)
 
 def fused_project_jv(dout, y_hat):
     dout = dout.clone()
